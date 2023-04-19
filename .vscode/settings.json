@@ -1,0 +1,7 @@
+{
+  "nuxt.isNuxtApp": false,
+  "i18n-ally.localesPaths": [
+    "src/locales",
+    "src/locales/lang"
+  ]
+}

@@ -4,8 +4,8 @@ const system = {
   component: 'basic',
   children: [
     {
-      name: 'material',
-      path: '/material/index',
+      name: 'material_list',
+      path: '/material/list',
       component: 'self',
       meta: {
         title: '素材中心',

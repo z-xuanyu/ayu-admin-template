@@ -18,6 +18,7 @@ const report = {
     title: '报告管理',
     icon: 'carbon:cloud-service-management',
     order: 2,
+    hide: true,
   },
 };
 

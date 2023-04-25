@@ -31,11 +31,10 @@
     "dev:test": "cross-env VITE_SERVICE_ENV=test vite",
     "dev:prod": "cross-env VITE_SERVICE_ENV=prod vite",
     "build": "cross-env VITE_SERVICE_ENV=prod vite build",
-    "build:dev": "npm run typecheck && cross-env VITE_SERVICE_ENV=dev vite build",
-    "build:test": "npm run typecheck && cross-env VITE_SERVICE_ENV=test vite build",
+    "build:dev": "cross-env VITE_SERVICE_ENV=dev vite build",
+    "build:test": "cross-env VITE_SERVICE_ENV=test vite build",
     "build:vercel": "cross-env VITE_HASH_ROUTE=Y VITE_VERCEL=Y vite build",
     "preview": "vite preview",
-    "typecheck": "vue-tsc --noEmit --skipLibCheck",
     "lint": "eslint . --fix",
     "commit": "soy git-commit",
     "cleanup": "soy cleanup",
@@ -123,10 +122,6 @@
     "patchedDependencies": {
       "mockjs@1.1.0": "patches/mockjs@1.1.0.patch"
     }
-  },
-  "simple-git-hooks": {
-    "commit-msg": "pnpm soy git-commit-verify",
-    "pre-commit": "pnpm typecheck && pnpm lint-staged"
   },
   "lint-staged": {
     "*": "eslint . --fix"

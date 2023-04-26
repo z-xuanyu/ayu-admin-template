@@ -5,15 +5,21 @@ import { PaginationProps } from 'naive-ui';
 import { reactive, shallowRef } from 'vue';
 import { columns } from './columns.data';
 import ColumnSetting from './components/ColumnSetting.vue';
+import { useRouter } from 'vue-router';
 
 defineOptions({
   name: 'ArticleList',
 });
 
+const router = useRouter();
 const { loading, startLoading, endLoading } = useLoading(false);
 const tableData = shallowRef([]);
 
-function handleAddTable() {}
+function handleAddTable() {
+  router.push({
+    name: 'article_add',
+  });
+}
 
 async function getTableData() {
   startLoading();

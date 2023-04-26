@@ -18,7 +18,10 @@ interface RequestParam {
  * @param axiosConfig - axios配置
  * @param backendConfig - 后端接口字段配置
  */
-export function createRequest(axiosConfig: AxiosRequestConfig, backendConfig?: Service.BackendResultConfig) {
+export function createRequest(
+  axiosConfig: AxiosRequestConfig,
+  backendConfig?: Service.BackendResultConfig,
+) {
   const customInstance = new CustomAxiosInstance(axiosConfig, backendConfig);
 
   /**
@@ -29,7 +32,9 @@ export function createRequest(axiosConfig: AxiosRequestConfig, backendConfig?: S
    * - data: 请求的body的data
    * - axiosConfig: axios配置
    */
-  async function asyncRequest<T>(param: RequestParam): Promise<Service.RequestResult<T>> {
+  async function asyncRequest<T>(
+    param: RequestParam,
+  ): Promise<Service.RequestResult<T>> {
     const { url } = param;
     const method = param.method || 'get';
     const { instance } = customInstance;
@@ -38,9 +43,12 @@ export function createRequest(axiosConfig: AxiosRequestConfig, backendConfig?: S
       method,
       url,
       data: param.data,
-      config: param.axiosConfig
+      config: param.axiosConfig,
     })) as Service.RequestResult<T>;
-
+    if (res.error?.code === 401) {
+      window.localStorage.clear();
+      window.location.reload();
+    }
     return res;
   }
 
@@ -96,7 +104,7 @@ export function createRequest(axiosConfig: AxiosRequestConfig, backendConfig?: S
     post,
     put,
     patch,
-    delete: handleDelete
+    delete: handleDelete,
   };
 }
 
@@ -112,7 +120,10 @@ interface RequestResultHook<T = any> {
  * @param axiosConfig - axios配置
  * @param backendConfig - 后端接口字段配置
  */
-export function createHookRequest(axiosConfig: AxiosRequestConfig, backendConfig?: Service.BackendResultConfig) {
+export function createHookRequest(
+  axiosConfig: AxiosRequestConfig,
+  backendConfig?: Service.BackendResultConfig,
+) {
   const customInstance = new CustomAxiosInstance(axiosConfig, backendConfig);
 
   /**
@@ -125,7 +136,9 @@ export function createHookRequest(axiosConfig: AxiosRequestConfig, backendConfig
    */
   function useRequest<T>(param: RequestParam): RequestResultHook<T> {
     const { loading, startLoading, endLoading } = useLoading();
-    const { bool: network, setBool: setNetwork } = useBoolean(window.navigator.onLine);
+    const { bool: network, setBool: setNetwork } = useBoolean(
+      window.navigator.onLine,
+    );
 
     startLoading();
     const data = ref<T | null>(null) as Ref<T | null>;
@@ -143,15 +156,19 @@ export function createHookRequest(axiosConfig: AxiosRequestConfig, backendConfig
     const method = param.method || 'get';
     const { instance } = customInstance;
 
-    getRequestResponse({ instance, method, url, data: param.data, config: param.axiosConfig }).then(
-      handleRequestResult
-    );
+    getRequestResponse({
+      instance,
+      method,
+      url,
+      data: param.data,
+      config: param.axiosConfig,
+    }).then(handleRequestResult);
 
     return {
       data,
       error,
       loading,
-      network
+      network,
     };
   }
 
@@ -196,7 +213,7 @@ export function createHookRequest(axiosConfig: AxiosRequestConfig, backendConfig
     get,
     post,
     put,
-    delete: handleDelete
+    delete: handleDelete,
   };
 }
 

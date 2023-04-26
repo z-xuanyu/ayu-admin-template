@@ -75,9 +75,6 @@ const rules = reactive({
 
 // 父级分类树结构
 const options = shallowRef([]);
-function handleUpdateValue(value: string) {
-  formModel.pid = value;
-}
 function TransformTreeArr(arr = [], pid = null): any {
   if (!Array.isArray(arr)) return;
   return arr
@@ -161,8 +158,7 @@ watch(
         <n-form-item-grid-item :span="20" label="父级" path="pid">
           <n-tree-select
             :options="options"
-            :default-value="formModel.pid"
-            @update:value="handleUpdateValue"
+            v-model:value="formModel.pid"
             placeholder="请选择父级"
           />
         </n-form-item-grid-item>

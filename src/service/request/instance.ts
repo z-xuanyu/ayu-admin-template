@@ -7,7 +7,7 @@ import {
   handleBackendError,
   handleResponseError,
   handleServiceResult,
-  transformRequestData
+  transformRequestData,
 } from '@/utils';
 import { handleRefreshToken } from './helpers';
 export default class CustomAxiosInstance {
@@ -26,8 +26,8 @@ export default class CustomAxiosInstance {
       codeKey: 'code',
       dataKey: 'data',
       msgKey: 'message',
-      successCode: 0
-    }
+      successCode: 0,
+    },
   ) {
     this.backendConfig = backendConfig;
     this.instance = axios.create(axiosConfig);
@@ -37,24 +37,29 @@ export default class CustomAxiosInstance {
   /** 设置请求拦截器 */
   setInterceptor() {
     this.instance.interceptors.request.use(
-      async config => {
+      async (config) => {
         const handleConfig = { ...config };
         if (handleConfig.headers) {
           // 数据转换
           const contentType = handleConfig.headers['Content-Type'] as string;
-          handleConfig.data = await transformRequestData(handleConfig.data, contentType);
+          handleConfig.data = await transformRequestData(
+            handleConfig.data,
+            contentType,
+          );
           // 设置token
-          handleConfig.headers.Authorization = `Bearer ${localStg.get('token')}`;
+          handleConfig.headers.Authorization = `Bearer ${localStg.get(
+            'token',
+          )}`;
         }
         return handleConfig;
       },
       (axiosError: AxiosError) => {
         const error = handleAxiosError(axiosError);
         return handleServiceResult(error, null);
-      }
+      },
     );
     this.instance.interceptors.response.use(
-      async response => {
+      async (response) => {
         const { status } = response;
         if (status === 200 || status < 300 || status === 304) {
           const backend = response.data;
@@ -81,7 +86,7 @@ export default class CustomAxiosInstance {
       (axiosError: AxiosError) => {
         const error = handleAxiosError(axiosError);
         return handleServiceResult(error, null);
-      }
+      },
     );
   }
 }

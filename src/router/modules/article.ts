@@ -9,6 +9,16 @@ const article = {
   },
   children: [
     {
+      name: 'article_category',
+      path: '/article/category',
+      component: 'self',
+      meta: {
+        title: '栏目分类',
+        requiresAuth: true,
+        icon: 'ic:round-manage-accounts',
+      },
+    },
+    {
       name: 'article_list',
       path: '/article/list',
       component: 'self',

@@ -9,14 +9,27 @@
       </n-space>
       <n-space align="center" :size="18">
         <n-button size="small" type="primary" @click="getTableData">
-          <icon-mdi-refresh class="mr-4px text-16px" :class="{ 'animate-spin': loading }" />
+          <icon-mdi-refresh
+            class="mr-4px text-16px"
+            :class="{ 'animate-spin': loading }"
+          />
           刷新表格
         </n-button>
         <column-setting v-model:columns="columns" />
       </n-space>
     </n-space>
-    <n-data-table :columns="columns" :data="tableData" :loading="loading" :pagination="pagination" />
-    <table-action-modal v-model:visible="visible" :type="modalType" :edit-data="editData" @success="getTableData" />
+    <n-data-table
+      :columns="columns"
+      :data="tableData"
+      :loading="loading"
+      :pagination="pagination"
+    />
+    <table-action-modal
+      v-model:visible="visible"
+      :type="modalType"
+      :edit-data="editData"
+      @success="getTableData"
+    />
   </n-card>
 </template>
 
@@ -44,7 +57,10 @@ async function getTableData() {
   const { data } = await getAdminList();
   if (data) {
     setTimeout(() => {
-      const list = (data as any).items.map((item: any) => ({ key: item._id, ...item }));
+      const list = (data as any).items.map((item: any) => ({
+        key: item._id,
+        ...item,
+      }));
       setTableData(list);
       endLoading();
     }, 1000);
@@ -54,55 +70,61 @@ async function getTableData() {
 const columns: Ref<DataTableColumns<UserManagement.User>> = ref([
   {
     type: 'selection',
-    align: 'center'
+    align: 'center',
   },
   {
     key: 'name',
     title: '用户名',
     align: 'center',
-    width: '200px'
+    width: '200px',
   },
   {
     key: 'avatar',
     title: '头像',
     align: 'center',
     width: '100px',
-    render: row => {
+    render: (row) => {
       return <NAvatar round size="small" src={row.avatar} />;
-    }
+    },
   },
   {
     key: 'gender',
     title: '性别',
     align: 'center',
     width: '100px',
-    render: row => {
+    render: (row) => {
       return (
-        <NTag type={Number(row.gender) === 1 ? 'success' : 'warning'}>{Number(row.gender) === 1 ? '男' : '女'}</NTag>
+        <NTag type={Number(row.gender) === 1 ? 'success' : 'warning'}>
+          {Number(row.gender) === 1 ? '男' : '女'}
+        </NTag>
       );
-    }
+    },
   },
 
   {
     key: 'email',
     title: '邮箱',
     align: 'center',
-    width: '200px'
+    width: '200px',
   },
   {
     key: 'phone',
     title: '手机号码',
     align: 'center',
-    width: '200px'
+    width: '200px',
   },
   {
     key: 'status',
     title: '状态',
     align: 'center',
     width: '100px',
-    render: row => {
-      return <NTag type={row.status ? 'success' : 'error'}>{row.status ? '正常' : '禁用'}</NTag>;
-    }
+    render: (row) => {
+      return (
+        <NTag type={row.status ? 'success' : 'error'}>
+          {row.status ? '正常' : '禁用'}
+        </NTag>
+      );
+    },
   },
   {
     key: 'actions',
@@ -110,7 +132,7 @@ const columns: Ref<DataTableColumns<UserManagement.User>> = ref([
     align: 'center',
     fixed: 'right',
     width: '200px',
-    render: row => {
+    render: (row) => {
       return (
         <NSpace justify={'center'}>
           <NButton size={'small'} onClick={() => handleEditTable(row._id)}>
@@ -123,13 +145,13 @@ const columns: Ref<DataTableColumns<UserManagement.User>> = ref([
                 <NButton type="error" size={'small'}>
                   删除
                 </NButton>
-              )
+              ),
             }}
           </NPopconfirm>
         </NSpace>
       );
-    }
-  }
+    },
+  },
 ]) as Ref<DataTableColumns<UserManagement.User>>;
 
 const modalType = ref<ModalType>('add');
@@ -150,7 +172,7 @@ function handleAddTable() {
 }
 
 function handleEditTable(rowId: string | undefined) {
-  const findItem = tableData.value.find(item => item._id === rowId);
+  const findItem = tableData.value.find((item) => item._id === rowId);
   if (findItem) {
     setEditData(findItem);
   }
@@ -175,15 +197,10 @@ const pagination: PaginationProps = reactive({
   onUpdatePageSize: (pageSize: number) => {
     pagination.pageSize = pageSize;
     pagination.page = 1;
-  }
+  },
 });
 
-function init() {
-  getTableData();
-}
-
-// 初始化
-init();
+getTableData();
 </script>
 
 <style scoped></style>

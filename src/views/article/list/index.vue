@@ -46,6 +46,8 @@ const pagination: PaginationProps = reactive({
     pagination.page = 1;
   },
 });
+
+getTableData();
 </script>
 
 <template>

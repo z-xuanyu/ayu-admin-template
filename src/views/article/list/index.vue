@@ -1,11 +1,19 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import { useLoading } from '@/hooks';
-import { getArticleList } from '@/service/api/article';
-import { PaginationProps } from 'naive-ui';
-import { reactive, shallowRef } from 'vue';
-import { columns } from './columns.data';
+import { getArticleList, removeArticle } from '@/service/api/article';
+import {
+  DataTableColumns,
+  NButton,
+  NImage,
+  NPopconfirm,
+  NSpace,
+  NTag,
+  PaginationProps,
+} from 'naive-ui';
+import { reactive, ShallowRef, shallowRef } from 'vue';
 import ColumnSetting from './components/ColumnSetting.vue';
 import { useRouter } from 'vue-router';
+import { ArticleColumn } from './type';
 
 defineOptions({
   name: 'ArticleList',
@@ -14,6 +22,104 @@ defineOptions({
 const router = useRouter();
 const { loading, startLoading, endLoading } = useLoading(false);
 const tableData = shallowRef([]);
+
+const columns: ShallowRef<DataTableColumns<ArticleColumn>> = shallowRef([
+  {
+    type: 'selection',
+    align: 'center',
+  },
+  {
+    key: 'title',
+    title: '标题',
+    align: 'center',
+    width: '200px',
+  },
+  {
+    key: 'categoryId',
+    title: '分类',
+    align: 'center',
+    width: '100px',
+    render: (row) => {
+      return (
+        <NTag type={row.categoryId ? 'success' : 'warning'}>
+          {row.categoryId ? row.category?.name : '暂无'}
+        </NTag>
+      );
+    },
+  },
+  {
+    key: 'cover',
+    title: '封面图',
+    align: 'center',
+    width: '100px',
+    render: (row) => <NImage src={row.cover} />,
+  },
+  {
+    key: 'digest',
+    title: '摘要',
+    align: 'center',
+    width: '200px',
+  },
+  {
+    key: 'views',
+    title: '浏览量',
+    align: 'center',
+    width: '100px',
+  },
+  {
+    key: 'author',
+    title: '作者',
+    align: 'center',
+    width: '100px',
+  },
+  {
+    key: 'updatedAt',
+    title: '更新时间',
+    align: 'center',
+    width: '130px',
+    render: (row) => new Date(row.updatedAt as string).toLocaleString(),
+  },
+  {
+    key: 'createdAt',
+    title: '创建时间',
+    align: 'center',
+    width: '130px',
+    render: (row) => new Date(row.createdAt as string).toLocaleString(),
+  },
+  {
+    key: 'actions',
+    title: '操作',
+    align: 'center',
+    fixed: 'right',
+    width: '200px',
+    render: (row) => {
+      return (
+        <NSpace justify={'center'}>
+          <NButton
+            size={'small'}
+            type="primary"
+            text
+            onClick={() => handleEditTable(row._id as string)}
+          >
+            编辑
+          </NButton>
+          <NPopconfirm
+            onPositiveClick={() => handleDeleteTable(row._id as string)}
+          >
+            {{
+              default: () => '确认删除',
+              trigger: () => (
+                <NButton type="error" size={'small'} text>
+                  删除
+                </NButton>
+              ),
+            }}
+          </NPopconfirm>
+        </NSpace>
+      );
+    },
+  },
+]) as ShallowRef<DataTableColumns<ArticleColumn>>;
 
 function handleAddTable() {
   router.push({
@@ -53,6 +159,22 @@ const pagination: PaginationProps = reactive({
   },
 });
 
+// 编辑
+function handleEditTable(id: string) {
+  router.push({
+    name: 'article_add',
+    query: {
+      id,
+    },
+  });
+}
+// 删除
+async function handleDeleteTable(id: string) {
+  await removeArticle(id);
+  window.$message?.success('删除成功!');
+  getTableData();
+}
+
 getTableData();
 </script>
 
@@ -81,6 +203,7 @@ getTableData();
         :columns="columns"
         :data="tableData"
         :loading="loading"
+        :single-line="false"
         :pagination="pagination"
       />
     </n-card>

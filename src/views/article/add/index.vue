@@ -1,18 +1,28 @@
 <script setup lang="ts">
 import '@wangeditor/editor/dist/css/style.css';
-import { reactive, shallowRef, onBeforeUnmount, onMounted } from 'vue';
+import { reactive, shallowRef, onBeforeUnmount, onMounted, ref } from 'vue';
 import SelectMaterial from '@/components/custom/SelectMaterial.vue';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { getCategoryList } from '@/service/api/category';
-import { AddArticleParams } from '@/service/api/article/type';
-import { addArticle } from '@/service/api/article';
+import {
+  AddArticleParams,
+  UdateArticleParams,
+} from '@/service/api/article/type';
+import {
+  addArticle,
+  getArticleInfo,
+  updateArticle,
+} from '@/service/api/article';
 
 defineOptions({
   name: 'ArticleAdd',
 });
 
 const router = useRouter();
+const route = useRoute();
+const articleId = ref(route.query.id);
+
 const editorRef = shallowRef();
 const toolbarConfig = {};
 const editorConfig = { placeholder: '请输入内容...' };
@@ -28,8 +38,16 @@ const handleCreated = (editor: any) => {
 
 onMounted(() => {
   getCategoryListData();
+  articleId.value && getArticleInfoData();
 });
 
+async function getArticleInfoData() {
+  const info = await getArticleInfo(articleId.value as string);
+  console.log(info, '文章信息');
+  formModel.value = info.data as AddArticleParams;
+}
+
+// 获取
 const options = shallowRef([]);
 function TransformTreeArr(arr = [], pid = null): any {
   if (!Array.isArray(arr)) return;
@@ -53,7 +71,7 @@ async function getCategoryListData() {
   options.value = TransformTreeArr(res.data.items);
 }
 
-const formModel = reactive<AddArticleParams>({
+const formModel = ref<AddArticleParams>({
   title: '',
   categoryId: null,
   cover: '',
@@ -89,10 +107,13 @@ function back() {
 }
 
 async function handleSubmit() {
-  await addArticle(formModel);
-  console.log(formModel);
-  window.$message?.success('添加成功！');
-
+  if (articleId.value) {
+    await updateArticle(formModel.value as UdateArticleParams);
+    window.$message?.success('更新成功!');
+  } else {
+    await addArticle(formModel.value);
+    window.$message?.success('添加成功！');
+  }
   back();
 }
 </script>
@@ -105,7 +126,7 @@ async function handleSubmit() {
       /></span>
       <span class="cursor-pointer" @click="back"> 返回</span>
       <span>|</span>
-      <span class="text-lg">添加文章</span>
+      <span class="text-lg"> {{ articleId ? '编辑文章' : '添加文章' }}</span>
     </div>
     <div class="mt-4 bg-white dark:bg-dark p-4">
       <n-form
@@ -209,7 +230,7 @@ async function handleSubmit() {
           <div class="right flex-1">
             <div class="w-full">
               <n-form-item label="文章内容" path="content">
-                <div class="border border-[#ccc] h-[700px]">
+                <div class="h-[650px]">
                   <Toolbar
                     style="border-bottom: 1px solid #ccc"
                     :editor="editorRef"
@@ -217,7 +238,11 @@ async function handleSubmit() {
                     mode="default"
                   />
                   <Editor
-                    style="height: 100%; overflow-y: hidden"
+                    style="
+                      height: 100%;
+                      overflow-y: hidden;
+                      border: 1px solid #ccc;
+                    "
                     v-model="formModel.content"
                     :defaultConfig="editorConfig"
                     mode="default"
@@ -232,7 +257,7 @@ async function handleSubmit() {
     </div>
     <div class="bg-white dark:bg-dark text-center py-4">
       <n-button type="primary" class="px-10" @click="handleSubmit">
-        保存
+        {{ articleId ? '确认更新' : '添加保存' }}
       </n-button>
     </div>
   </div>

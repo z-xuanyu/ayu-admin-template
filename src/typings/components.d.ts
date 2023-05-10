@@ -44,6 +44,7 @@ declare module '@vue/runtime-core' {
     'IconMaterialSymbols:cancelOutlineRounded': typeof import('~icons/material-symbols/cancel-outline-rounded')['default']
     'IconMaterialSymbols:checkCircle': typeof import('~icons/material-symbols/check-circle')['default']
     'IconMaterialSymbols:search': typeof import('~icons/material-symbols/search')['default']
+    'IconMdi:magnify': typeof import('~icons/mdi/magnify')['default']
     IconMdiArrowDownThin: typeof import('~icons/mdi/arrow-down-thin')['default']
     IconMdiArrowUpThin: typeof import('~icons/mdi/arrow-up-thin')['default']
     IconMdiDrag: typeof import('~icons/mdi/drag')['default']

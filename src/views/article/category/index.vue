@@ -172,6 +172,45 @@ getTableData();
 
 <template>
   <div class="h-full overflow-hidden">
+    <!-- 条件搜索 -->
+    <n-card :bordered="false" class="rounded shadow-sm mb-4">
+      <n-form label-placement="left" :label-width="80">
+        <div class="grid grid-cols-1 gap-x-6 lg:grid-cols-2 xl:grid-cols-4">
+          <n-form-item label="栏目名称">
+            <n-input placeholder="请输入栏目名称" />
+          </n-form-item>
+          <n-form-item label="状态">
+            <n-select
+              :options="[
+                {
+                  label: '正常',
+                  value: 0,
+                },
+                {
+                  label: '禁用',
+                  value: 1,
+                },
+              ]"
+              placeholder="请选择状态"
+              clearable
+            />
+          </n-form-item>
+          <n-space>
+            <n-button type="primary">
+              <icon-mdi:magnify class="mr-4px text-20px" />
+              搜索
+            </n-button>
+            <n-button>
+              <icon-mdi-refresh
+                class="mr-4px text-16px"
+                :class="{ 'animate-spin': loading }"
+              />
+              重置
+            </n-button>
+          </n-space>
+        </div>
+      </n-form>
+    </n-card>
     <n-card :bordered="false" class="rounded-16px shadow-sm">
       <n-space class="pb-12px" justify="space-between">
         <n-space>

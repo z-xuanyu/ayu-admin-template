@@ -14,6 +14,8 @@ import { reactive, ShallowRef, shallowRef } from 'vue';
 import ColumnSetting from './components/ColumnSetting.vue';
 import { useRouter } from 'vue-router';
 import { ArticleColumn } from './type';
+import { getCategoryList } from '@/service/api/category';
+import { transformSelectOptionTreeArr } from '@/utils/common/transform';
 
 defineOptions({
   name: 'ArticleList',
@@ -73,18 +75,24 @@ const columns: ShallowRef<DataTableColumns<ArticleColumn>> = shallowRef([
     width: '100px',
   },
   {
+    key: 'status',
+    title: '状态',
+    align: 'center',
+    width: '100px',
+    render: (row) => {
+      return (
+        <NTag type={row.status ? 'success' : 'warning'}>
+          {row.status ? '正常' : '禁用'}
+        </NTag>
+      );
+    },
+  },
+  {
     key: 'updatedAt',
     title: '更新时间',
     align: 'center',
     width: '130px',
     render: (row) => new Date(row.updatedAt as string).toLocaleString(),
-  },
-  {
-    key: 'createdAt',
-    title: '创建时间',
-    align: 'center',
-    width: '130px',
-    render: (row) => new Date(row.createdAt as string).toLocaleString(),
   },
   {
     key: 'actions',
@@ -127,11 +135,39 @@ function handleAddTable() {
   });
 }
 
+// 搜索form
+const searchForm = reactive<{
+  title: string;
+  status: string;
+  categoryId: string | null;
+}>({
+  title: '',
+  categoryId: null,
+  status: '',
+});
+
+const categoryOptions = shallowRef([]);
+async function getCategoryListData() {
+  const res: any = await getCategoryList({
+    pageNumber: 1,
+    pageSize: 1000,
+  });
+  categoryOptions.value = transformSelectOptionTreeArr(res.data.items);
+}
+
+function handleResetSearchForm() {
+  searchForm.title = '';
+  searchForm.status = '';
+}
+
 async function getTableData() {
   startLoading();
   const { data } = await getArticleList({
     pageNumber: 1,
     pageSize: 10,
+    title: searchForm.title,
+    status: searchForm.status,
+    categoryId: searchForm.categoryId,
   });
   if (data) {
     setTimeout(() => {
@@ -176,11 +212,63 @@ async function handleDeleteTable(id: string) {
 }
 
 getTableData();
+getCategoryListData();
 </script>
 
 <template>
   <div class="h-full overflow-hidden">
-    <n-card title="文章管理" :bordered="false" class="rounded-16px shadow-sm">
+    <n-card :bordered="false" class="rounded shadow-sm mb-4">
+      <n-form label-placement="left" :label-width="80" ref="searchFormRef">
+        <div class="grid grid-cols-1 gap-x-6 lg:grid-cols-2 xl:grid-cols-4">
+          <n-form-item label="文章标题">
+            <n-input
+              v-model:value="searchForm.title"
+              placeholder="请输入文章标题"
+              clearable
+            />
+          </n-form-item>
+          <n-form-item label="栏目分类">
+            <n-tree-select
+              :options="categoryOptions"
+              v-model:value="searchForm.categoryId"
+              placeholder="请选择分类"
+              clearable
+            />
+          </n-form-item>
+          <n-form-item label="状态">
+            <n-select
+              v-model:value="searchForm.status"
+              :options="[
+                {
+                  label: '正常',
+                  value: 'true',
+                },
+                {
+                  label: '禁用',
+                  value: 'false',
+                },
+              ]"
+              placeholder="请选择状态"
+              clearable
+            />
+          </n-form-item>
+          <n-space>
+            <n-button type="primary" @click="getTableData">
+              <icon-mdi:magnify class="mr-4px text-20px" />
+              搜索
+            </n-button>
+            <n-button @click="handleResetSearchForm">
+              <icon-mdi-refresh
+                class="mr-4px text-16px"
+                :class="{ 'animate-spin': loading }"
+              />
+              重置
+            </n-button>
+          </n-space>
+        </div>
+      </n-form>
+    </n-card>
+    <n-card :bordered="false" class="rounded-16px shadow-sm">
       <n-space class="pb-12px" justify="space-between">
         <n-space>
           <n-button type="primary" size="small" @click="handleAddTable">

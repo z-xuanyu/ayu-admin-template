@@ -1,6 +1,10 @@
 export interface QueryArticleParams {
   title?: string;
 
+  categoryId?: null | string;
+
+  status?: string;
+
   pageSize: number;
 
   pageNumber: number;

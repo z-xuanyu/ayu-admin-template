@@ -1,36 +1,98 @@
 <template>
-  <n-card title="管理员列表" :bordered="false" class="rounded-16px shadow-sm">
-    <n-space class="pb-12px" justify="space-between">
-      <n-space>
-        <n-button type="primary" size="small" @click="handleAddTable">
-          <icon-ic-round-plus class="mr-4px text-20px" />
-          新增
-        </n-button>
+  <div class="admin-page">
+    <n-card :bordered="false" class="rounded shadow-sm mb-4">
+      <n-form label-placement="left" :label-width="60">
+        <div class="grid grid-cols-1 gap-x-6 lg:grid-cols-2 xl:grid-cols-4">
+          <n-form-item label="用户名">
+            <n-input placeholder="请输入用户名称" />
+          </n-form-item>
+          <n-form-item label="邮箱">
+            <n-input placeholder="请输入邮箱" />
+          </n-form-item>
+          <n-form-item label="手机号">
+            <n-input placeholder="请输入手机号" />
+          </n-form-item>
+          <n-form-item label="性别">
+            <n-select
+              :options="[
+                {
+                  label: '男',
+                  value: 0,
+                },
+                {
+                  label: '女',
+                  value: 1,
+                },
+              ]"
+              placeholder="请选择性别"
+              clearable
+            />
+          </n-form-item>
+          <n-form-item label="状态">
+            <n-select
+              :options="[
+                {
+                  label: '正常',
+                  value: 0,
+                },
+                {
+                  label: '禁用',
+                  value: 1,
+                },
+              ]"
+              placeholder="请选择状态"
+              clearable
+            />
+          </n-form-item>
+          <n-space>
+            <n-button type="primary">
+              <icon-mdi:magnify class="mr-4px text-20px" />
+              搜索
+            </n-button>
+            <n-button>
+              <icon-mdi-refresh
+                class="mr-4px text-16px"
+                :class="{ 'animate-spin': loading }"
+              />
+              重置
+            </n-button>
+          </n-space>
+        </div>
+      </n-form>
+    </n-card>
+    <n-card :bordered="false" class="rounded-16px shadow-sm">
+      <n-space class="pb-12px" justify="space-between">
+        <n-space>
+          <n-button type="primary" size="small" @click="handleAddTable">
+            <icon-ic-round-plus class="mr-4px text-20px" />
+            新增
+          </n-button>
+        </n-space>
+        <n-space align="center" :size="18">
+          <n-button size="small" type="primary" @click="getTableData">
+            <icon-mdi-refresh
+              class="mr-4px text-16px"
+              :class="{ 'animate-spin': loading }"
+            />
+            刷新表格
+          </n-button>
+          <column-setting v-model:columns="columns" />
+        </n-space>
       </n-space>
-      <n-space align="center" :size="18">
-        <n-button size="small" type="primary" @click="getTableData">
-          <icon-mdi-refresh
-            class="mr-4px text-16px"
-            :class="{ 'animate-spin': loading }"
-          />
-          刷新表格
-        </n-button>
-        <column-setting v-model:columns="columns" />
-      </n-space>
-    </n-space>
-    <n-data-table
-      :columns="columns"
-      :data="tableData"
-      :loading="loading"
-      :pagination="pagination"
-    />
-    <table-action-modal
-      v-model:visible="visible"
-      :type="modalType"
-      :edit-data="editData"
-      @success="getTableData"
-    />
-  </n-card>
+      <n-data-table
+        :columns="columns"
+        :data="tableData"
+        :loading="loading"
+        :pagination="pagination"
+      />
+      <table-action-modal
+        v-model:visible="visible"
+        :type="modalType"
+        :edit-data="editData"
+        @success="getTableData"
+      />
+    </n-card>
+  </div>
 </template>
 
 <script setup lang="tsx">
@@ -112,6 +174,7 @@ const columns: Ref<DataTableColumns<UserManagement.User>> = ref([
     title: '手机号码',
     align: 'center',
     width: '200px',
+    render: (row) => row.phone || '无设置',
   },
   {
     key: 'status',

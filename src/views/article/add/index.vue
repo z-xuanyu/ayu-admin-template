@@ -5,6 +5,7 @@ import SelectMaterial from '@/components/custom/SelectMaterial.vue';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getCategoryList } from '@/service/api/category';
+import { transformSelectOptionTreeArr } from '@/utils/common/transform';
 import {
   AddArticleParams,
   UdateArticleParams,
@@ -49,26 +50,13 @@ async function getArticleInfoData() {
 
 // 获取
 const options = shallowRef([]);
-function TransformTreeArr(arr = [], pid = null): any {
-  if (!Array.isArray(arr)) return;
-  return arr
-    .filter((item: any) => item.pid == pid)
-    .map((childItem: any) =>
-      TransformTreeArr(arr, childItem._id).length
-        ? {
-            key: childItem._id,
-            label: childItem.name,
-            children: TransformTreeArr(arr, childItem._id),
-          }
-        : { key: childItem._id, label: childItem.name },
-    );
-}
+
 async function getCategoryListData() {
   const res: any = await getCategoryList({
     pageNumber: 1,
     pageSize: 1000,
   });
-  options.value = TransformTreeArr(res.data.items);
+  options.value = transformSelectOptionTreeArr(res.data.items);
 }
 
 const formModel = ref<AddArticleParams>({

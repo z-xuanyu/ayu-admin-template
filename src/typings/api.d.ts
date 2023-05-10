@@ -42,7 +42,7 @@ declare namespace ApiUserManagement {
     email: string;
 
     // 登录密码
-    password: string;
+    password?: string;
     /**
      * 用户状态
      * - 1: 启用

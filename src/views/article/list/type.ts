@@ -19,6 +19,8 @@ export interface ArticleColumn {
 
   author: string;
 
+  status: boolean;
+
   updatedAt: string;
 
   createdAt: string;
